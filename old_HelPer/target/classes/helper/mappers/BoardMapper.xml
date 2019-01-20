@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.helper.dao.BoardDAO">
+
+	<!-- 공통 로그인 회원정보 가져오기-->
+	<select id="memberIdPwdCheck" resultType="com.spring.helper.vo.BoardVO.UserVO">
+		select memberNumber,memberEmail,memberId,memberCountry from users where memberNumber=10010
+	</select>
+
+	<!-- 동욱이 시작 -->
+	<!-- 지식인 게시판 갯수 구하기 -->
+	<select id="knowledgeGetArticleCnt" resultType="int">
+	select count(*) from knowledge
+	</select>
+	<!-- 지식인 게시판 리스트 출력 -->
+	<select id="knowledgeGetArticleList" parameterType="java.util.Map" resultType="com.spring.helper.vo.BoardVO.KnowledgeVO">
+	<![CDATA[
+	SELECT *  
+	FROM(SELECT knowledgeNumber, memberNumber, boardCode, memberEmail, memberId, knowledgeSubject, 
+		 		knowledgeContent, knowledgeOpenCheck, knowledgeReward, knowledgeCategory, knowledgeLookup,
+		 		knowledgeRegdate,knowledgeReply,knowledgeTemp1,knowledgeTemp2,knowledgeTemp3, rownum rNum  
+		 FROM ( 
+			 	SELECT * 
+			 	FROM knowledge
+			 	ORDER BY knowledgeRegdate DESC
+			  )
+		 )  
+	WHERE rNum >= #{start} AND rNum <= #{end}
+	]]>
+	</select>
+	<!-- 질문등록 처리 -->
+	<insert id="knowledgeInsertArticle" parameterType="com.spring.helper.vo.BoardVO.KnowledgeVO">
+	INSERT INTO knowledge VALUES(knowledgeseq.nextval,'10005','10','park@gmail.com','park',#{knowledgeSubject},#{knowledgeContent},#{knowledgeOpenCheck},#{knowledgeReward},#{knowledgeCategory},0,sysdate,'0','0','0',0)
+	</insert>
+	<!-- 지식인게시판 게시글 상세페이지 출력 -->
+	<select id="knowledgeGetArticle" resultType="com.spring.helper.vo.BoardVO.KnowledgeVO">
+	SELECT * FROM knowledge WHERE knowledgeNumber=#{knowledgeNumber}
+	</select>
+	<!-- 답변등록 처리 -->
+	<insert id="knowledgeCommentPro" parameterType="java.util.Map">
+	INSERT INTO kComment VALUES(knowledgeseq.nextval,#{knowledgeNumber},'10','park@gmail.com','park',#{kCommentContent},'N',sysdate,'N','N',0)
+	</insert>
+	<!-- 동욱이 종료 -->
+</mapper>
